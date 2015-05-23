@@ -1,0 +1,443 @@
+From ee03b1386d47781a2d96bf37981c69ed137da337 Mon Sep 17 00:00:00 2001
+From: kuzu <kuzu@kuzu-VirtualBox.(none)>
+Date: Fri, 7 Mar 2014 16:25:10 +0100
+Subject: [PATCH] patch
+
+---
+ include/linux/init_task.h    |    3 +
+ include/linux/sched.h        |   19 ++++++
+ include/linux/sched/sysctl.h |    3 +
+ kernel/sched/Makefile        |    2 +-
+ kernel/sched/core.c          |   38 ++++++++---
+ kernel/sched/dummy.c         |  148 ++++++++++++++++++++++++++++++++++++++++++
+ kernel/sched/fair.c          |    2 +-
+ kernel/sched/sched.h         |    8 +++
+ kernel/sysctl.c              |   14 ++++
+ 9 files changed, 227 insertions(+), 10 deletions(-)
+ create mode 100644 kernel/sched/dummy.c
+
+diff --git a/include/linux/init_task.h b/include/linux/init_task.h
+index 5cd0f09..057f865 100644
+--- a/include/linux/init_task.h
++++ b/include/linux/init_task.h
+@@ -179,6 +179,9 @@ extern struct task_group root_task_group;
+ 		.run_list	= LIST_HEAD_INIT(tsk.rt.run_list),	\
+ 		.time_slice	= RR_TIMESLICE,				\
+ 	},								\
++	.dummy_se       = {                                             \
++		.run_list       = LIST_HEAD_INIT(tsk.dummy_se.run_list),\
++	},								\
+ 	.tasks		= LIST_HEAD_INIT(tsk.tasks),			\
+ 	INIT_PUSHABLE_TASKS(tsk)					\
+ 	INIT_CGROUP_SCHED(tsk)						\
+diff --git a/include/linux/sched.h b/include/linux/sched.h
+index e057ea0..1958e99 100644
+--- a/include/linux/sched.h
++++ b/include/linux/sched.h
+@@ -1018,6 +1018,9 @@ struct sched_rt_entity {
+ #endif
+ };
+ 
++struct sched_dummy_entity {
++	struct list_head run_list;
++};
+ 
+ struct rcu_node;
+ 
+@@ -1046,6 +1049,7 @@ struct task_struct {
+ 	const struct sched_class *sched_class;
+ 	struct sched_entity se;
+ 	struct sched_rt_entity rt;
++	struct sched_dummy_entity dummy_se;
+ #ifdef CONFIG_CGROUP_SCHED
+ 	struct task_group *sched_task_group;
+ #endif
+@@ -1427,6 +1431,21 @@ static inline void set_numabalancing_state(bool enabled)
+ }
+ #endif
+ 
++#define MIN_DUMMY_PRIO  131
++#define MAX_DUMMY_PRIO  135
++
++static inline int dummy_prio(int prio)
++{
++        if (prio >= MIN_DUMMY_PRIO && prio <= MAX_DUMMY_PRIO)
++                return 1;
++        return 0;
++}
++
++static inline int dummy_task(struct task_struct *p)
++{
++        return dummy_prio(p->prio);
++}
++
+ static inline struct pid *task_pid(struct task_struct *task)
+ {
+ 	return task->pids[PIDTYPE_PID].pid;
+diff --git a/include/linux/sched/sysctl.h b/include/linux/sched/sysctl.h
+index bf8086b..ad737d4 100644
+--- a/include/linux/sched/sysctl.h
++++ b/include/linux/sched/sysctl.h
+@@ -36,6 +36,9 @@ extern unsigned int sysctl_sched_min_granularity;
+ extern unsigned int sysctl_sched_wakeup_granularity;
+ extern unsigned int sysctl_sched_child_runs_first;
+ 
++extern unsigned int sysctl_sched_dummy_timeslice;
++extern unsigned int sysctl_sched_dummy_age_threshold;
++
+ enum sched_tunable_scaling {
+ 	SCHED_TUNABLESCALING_NONE,
+ 	SCHED_TUNABLESCALING_LOG,
+diff --git a/kernel/sched/Makefile b/kernel/sched/Makefile
+index 54adcf3..ec82121 100644
+--- a/kernel/sched/Makefile
++++ b/kernel/sched/Makefile
+@@ -11,7 +11,7 @@ ifneq ($(CONFIG_SCHED_OMIT_FRAME_POINTER),y)
+ CFLAGS_core.o := $(PROFILING) -fno-omit-frame-pointer
+ endif
+ 
+-obj-y += core.o proc.o clock.o cputime.o idle_task.o fair.o rt.o stop_task.o
++obj-y += core.o proc.o clock.o cputime.o idle_task.o fair.o rt.o stop_task.o dummy.o
+ obj-$(CONFIG_SMP) += cpupri.o
+ obj-$(CONFIG_SCHED_AUTOGROUP) += auto_group.o
+ obj-$(CONFIG_SCHEDSTATS) += stats.o
+diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+index 05c39f0..08fe7b1 100644
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -1708,8 +1708,13 @@ void sched_fork(struct task_struct *p)
+ 		p->sched_reset_on_fork = 0;
+ 	}
+ 
+-	if (!rt_prio(p->prio))
+-		p->sched_class = &fair_sched_class;
++	if (!rt_prio(p->prio)) {
++		if(dummy_prio(p->prio)) {
++			p->sched_class = &dummy_sched_class;
++		} else {
++			p->sched_class = &fair_sched_class;
++		}
++	}
+ 
+ 	if (p->sched_class->task_fork)
+ 		p->sched_class->task_fork(p);
+@@ -2334,11 +2339,11 @@ pick_next_task(struct rq *rq)
+ 	 * Optimization: we know that if all tasks are in
+ 	 * the fair class we can call that function directly:
+ 	 */
+-	if (likely(rq->nr_running == rq->cfs.h_nr_running)) {
+-		p = fair_sched_class.pick_next_task(rq);
+-		if (likely(p))
+-			return p;
+-	}
++//	if (likely(rq->nr_running == rq->cfs.h_nr_running)) {
++//		p = fair_sched_class.pick_next_task(rq);
++//		if (likely(p))
++//			return p;
++//	}
+ 
+ 	for_each_class(class) {
+ 		p = class->pick_next_task(rq);
+@@ -3077,6 +3082,8 @@ void rt_mutex_setprio(struct task_struct *p, int prio)
+ 
+ 	if (rt_prio(prio))
+ 		p->sched_class = &rt_sched_class;
++	else if (dummy_prio(prio))
++		p->sched_class = &dummy_sched_class;
+ 	else
+ 		p->sched_class = &fair_sched_class;
+ 
+@@ -3125,6 +3132,13 @@ void set_user_nice(struct task_struct *p, long nice)
+ 	p->prio = effective_prio(p);
+ 	delta = p->prio - old_prio;
+ 
++	const struct sched_class *prev_class = p->sched_class;
++
++	if (dummy_prio(p->prio))
++		p->sched_class = &dummy_sched_class;
++	else
++		p->sched_class = &fair_sched_class;
++
+ 	if (on_rq) {
+ 		enqueue_task(rq, p, 0);
+ 		/*
+@@ -3134,6 +3148,8 @@ void set_user_nice(struct task_struct *p, long nice)
+ 		if (delta < 0 || (delta > 0 && task_running(rq, p)))
+ 			resched_task(rq->curr);
+ 	}
++
++	check_class_changed(rq, p, prev_class, old_prio);
+ out_unlock:
+ 	task_rq_unlock(rq, p, &flags);
+ }
+@@ -3277,6 +3293,8 @@ __setscheduler(struct rq *rq, struct task_struct *p, int policy, int prio)
+ 	p->prio = rt_mutex_getprio(p);
+ 	if (rt_prio(p->prio))
+ 		p->sched_class = &rt_sched_class;
++	else if (dummy_prio(p->prio))
++		p->sched_class = &dummy_sched_class;
+ 	else
+ 		p->sched_class = &fair_sched_class;
+ 	set_load_weight(p);
+@@ -6459,6 +6477,7 @@ void __init sched_init(void)
+ 		rq->calc_load_update = jiffies + LOAD_FREQ;
+ 		init_cfs_rq(&rq->cfs);
+ 		init_rt_rq(&rq->rt, rq);
++		init_dummy_rq(&rq->dummy, rq);
+ #ifdef CONFIG_FAIR_GROUP_SCHED
+ 		root_task_group.shares = ROOT_TASK_GROUP_LOAD;
+ 		INIT_LIST_HEAD(&rq->leaf_cfs_rq_list);
+@@ -6552,7 +6571,10 @@ void __init sched_init(void)
+ 	/*
+ 	 * During early bootup we pretend to be a normal task:
+ 	 */
+-	current->sched_class = &fair_sched_class;
++	if (unlikely(current->prio >= MIN_DUMMY_PRIO && current->prio <= MAX_DUMMY_PRIO))
++		current->sched_class = &dummy_sched_class;
++	else
++		current->sched_class = &fair_sched_class;
+ 
+ #ifdef CONFIG_SMP
+ 	zalloc_cpumask_var(&sched_domains_tmpmask, GFP_NOWAIT);
+diff --git a/kernel/sched/dummy.c b/kernel/sched/dummy.c
+new file mode 100644
+index 0000000..48d7618
+--- /dev/null
++++ b/kernel/sched/dummy.c
+@@ -0,0 +1,148 @@
++/*
++ * Dummy scheduling class, mapped to range of 5 levels of SCHED_NORMAL policy
++ */
++
++#include "sched.h"
++
++/*
++ * Timeslice and age threshold are represented in jiffies. Default timeslice
++ * is 100ms. Both parameters can be tuned from /proc/sys/kernel.
++ */
++
++#define DUMMY_TIMESLICE		(100 * HZ / 1000)
++#define DUMMY_AGE_THRESHOLD	(3 * DUMMY_TIMESLICE)
++
++unsigned int sysctl_sched_dummy_timeslice = DUMMY_TIMESLICE;
++static inline unsigned int get_timeslice()
++{
++	return sysctl_sched_dummy_timeslice;
++}
++
++unsigned int sysctl_sched_dummy_age_threshold = DUMMY_AGE_THRESHOLD;
++static inline unsigned int get_age_threshold()
++{
++	return sysctl_sched_dummy_age_threshold;
++}
++
++/*
++ * Init
++ */
++
++void init_dummy_rq(struct dummy_rq *dummy_rq, struct rq *rq)
++{
++	INIT_LIST_HEAD(&dummy_rq->queue);
++}
++
++/*
++ * Helper functions
++ */
++
++static inline struct task_struct *dummy_task_of(struct sched_dummy_entity *dummy_se)
++{
++	return container_of(dummy_se, struct task_struct, dummy_se);
++}
++
++static inline void _enqueue_task_dummy(struct rq *rq, struct task_struct *p)
++{
++	struct sched_dummy_entity *dummy_se = &p->dummy_se;
++	struct list_head *queue = &rq->dummy.queue;
++	list_add_tail(&dummy_se->run_list, queue);
++}
++
++static inline void _dequeue_task_dummy(struct task_struct *p)
++{
++	struct sched_dummy_entity *dummy_se = &p->dummy_se;
++	list_del_init(&dummy_se->run_list);
++}
++
++/*
++ * Scheduling class functions to implement
++ */
++
++static void enqueue_task_dummy(struct rq *rq, struct task_struct *p, int flags)
++{
++	_enqueue_task_dummy(rq, p);
++	inc_nr_running(rq);
++}
++
++static void dequeue_task_dummy(struct rq *rq, struct task_struct *p, int flags)
++{
++	_dequeue_task_dummy(p);
++	dec_nr_running(rq);
++}
++
++static void yield_task_dummy(struct rq *rq)
++{
++}
++
++static void check_preempt_curr_dummy(struct rq *rq, struct task_struct *p, int flags)
++{
++}
++
++static struct task_struct *pick_next_task_dummy(struct rq *rq)
++{
++	struct dummy_rq *dummy_rq = &rq->dummy;
++	struct sched_dummy_entity *next;
++
++	if (!list_empty(&dummy_rq->queue)) {
++		next = list_first_entry(&dummy_rq->queue, struct sched_dummy_entity, run_list);
++		return dummy_task_of(next);
++	} else {
++		return NULL;
++	}
++}
++
++static void put_prev_task_dummy(struct rq *rq, struct task_struct *prev)
++{
++}
++
++static void set_curr_task_dummy(struct rq *rq)
++{
++}
++
++static void task_tick_dummy(struct rq *rq, struct task_struct *curr, int queued)
++{
++}
++
++static void switched_from_dummy(struct rq *rq, struct task_struct *p)
++{
++}
++
++static void switched_to_dummy(struct rq *rq, struct task_struct *p)
++{
++}
++
++static void prio_changed_dummy(struct rq *rq, struct task_struct *p, int oldprio)
++{
++}
++
++static unsigned int get_rr_interval_dummy(struct rq *rq, struct task_struct *p)
++{
++	return get_timeslice();
++}
++
++/*
++ * Scheduling class
++ */
++
++const struct sched_class dummy_sched_class = {
++	.next			= &idle_sched_class,
++	.enqueue_task		= enqueue_task_dummy,
++	.dequeue_task		= dequeue_task_dummy,
++	.yield_task		= yield_task_dummy,
++
++	.check_preempt_curr 	= check_preempt_curr_dummy,
++
++	.pick_next_task		= pick_next_task_dummy,
++	.put_prev_task		= put_prev_task_dummy,
++
++	.set_curr_task		= set_curr_task_dummy,
++	.task_tick		= task_tick_dummy,
++
++	.switched_from		= switched_from_dummy,
++	.switched_to		= switched_to_dummy,
++	.prio_changed		= prio_changed_dummy,
++
++	.get_rr_interval	= get_rr_interval_dummy,
++};
++
+diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+index 31cbc15..b2c4576 100644
+--- a/kernel/sched/fair.c
++++ b/kernel/sched/fair.c
+@@ -6181,7 +6181,7 @@ static unsigned int get_rr_interval_fair(struct rq *rq, struct task_struct *task
+  * All the scheduling class methods:
+  */
+ const struct sched_class fair_sched_class = {
+-	.next			= &idle_sched_class,
++	.next			= &dummy_sched_class,
+ 	.enqueue_task		= enqueue_task_fair,
+ 	.dequeue_task		= dequeue_task_fair,
+ 	.yield_task		= yield_task_fair,
+diff --git a/kernel/sched/sched.h b/kernel/sched/sched.h
+index ef0a7b2..4ddbc94 100644
+--- a/kernel/sched/sched.h
++++ b/kernel/sched/sched.h
+@@ -116,6 +116,7 @@ extern struct mutex sched_domains_mutex;
+ 
+ struct cfs_rq;
+ struct rt_rq;
++struct dummy_rq;
+ 
+ extern struct list_head task_groups;
+ 
+@@ -361,6 +362,10 @@ struct rt_rq {
+ #endif
+ };
+ 
++struct dummy_rq {
++	struct list_head queue;
++};
++
+ #ifdef CONFIG_SMP
+ 
+ /*
+@@ -425,6 +430,7 @@ struct rq {
+ 
+ 	struct cfs_rq cfs;
+ 	struct rt_rq rt;
++	struct dummy_rq dummy;
+ 
+ #ifdef CONFIG_FAIR_GROUP_SCHED
+ 	/* list of leaf cfs_rq on this cpu: */
+@@ -1013,6 +1019,7 @@ struct sched_class {
+ extern const struct sched_class stop_sched_class;
+ extern const struct sched_class rt_sched_class;
+ extern const struct sched_class fair_sched_class;
++extern const struct sched_class dummy_sched_class;
+ extern const struct sched_class idle_sched_class;
+ 
+ 
+@@ -1304,6 +1311,7 @@ extern void print_rt_stats(struct seq_file *m, int cpu);
+ 
+ extern void init_cfs_rq(struct cfs_rq *cfs_rq);
+ extern void init_rt_rq(struct rt_rq *rt_rq, struct rq *rq);
++extern void init_dummy_rq(struct dummy_rq *dummy_rq, struct rq *rq);
+ 
+ extern void account_cfs_bandwidth_used(int enabled, int was_enabled);
+ 
+diff --git a/kernel/sysctl.c b/kernel/sysctl.c
+index 07f6fc4..34dffc2 100644
+--- a/kernel/sysctl.c
++++ b/kernel/sysctl.c
+@@ -307,6 +307,20 @@ static struct ctl_table kern_table[] = {
+ 		.extra1		= &min_wakeup_granularity_ns,
+ 		.extra2		= &max_wakeup_granularity_ns,
+ 	},
++	{
++		.procname       = "sched_dummy_timeslice",
++		.data           = &sysctl_sched_dummy_timeslice,
++		.maxlen         = sizeof(unsigned int),
++		.mode           = 0644,
++		.proc_handler   = proc_dointvec
++	},
++	{
++	.procname       = "sched_dummy_age_threshold",
++		.data           = &sysctl_sched_dummy_age_threshold,
++		.maxlen         = sizeof(unsigned int),
++		.mode           = 0644,
++		.proc_handler   = proc_dointvec
++	},
+ #ifdef CONFIG_SMP
+ 	{
+ 		.procname	= "sched_tunable_scaling",
+-- 
+1.7.9.5
+
