@@ -1,0 +1,26 @@
+Program is runing ... 
+This is solution:
+---------step:1----------
+2       0       2       0       
+0       0       0       0       
+0       0       0       0       
+0       0       0       0       
+---------step:2----------
+0       0       0       4       
+0       0       0       0       
+0       0       0       0       
+0       0       0       4       
+---------step:3----------
+4       0       0       0       
+0       0       0       0       
+0       0       0       0       
+4       0       0       4       
+---------step:4----------
+0       0       0       4       
+0       0       0       0       
+0       0       0       0       
+0       0       4       8       
+Solution found!
+It takes 0.007 s
+Used memory is bytes: 401016.0 bytes
+Used memory is megabytes: 0.38243865966796875 MB

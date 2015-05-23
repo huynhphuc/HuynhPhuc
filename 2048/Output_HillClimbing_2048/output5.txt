@@ -1,0 +1,161 @@
+Program is runing ... 
+Value of this state: 10
+----------step:1----------
+4       0       0       0       
+0       2       0       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 14
+----------step:2----------
+4       2       4       0       
+0       0       0       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 19
+----------step:3----------
+4       4       2       4       
+0       0       0       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 24
+----------step:4----------
+4       8       2       4       
+0       0       0       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 27
+----------step:5----------
+4       0       0       0       
+0       0       0       0       
+0       0       0       0       
+4       8       2       4       
+Value of this state: 31
+----------step:6----------
+8       8       2       4       
+4       0       0       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 36
+----------step:7----------
+4       16      2       4       
+0       0       0       4       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 40
+----------step:8----------
+4       16      2       8       
+4       0       0       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 44
+----------step:9----------
+8       16      2       8       
+4       0       0       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 49
+----------step:10----------
+8       16      2       8       
+4       0       0       4       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 54
+----------step:11----------
+8       16      2       8       
+4       0       0       8       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 58
+----------step:12----------
+8       16      2       16      
+4       4       0       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 63
+----------step:13----------
+8       16      2       16      
+4       0       0       8       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 68
+----------step:14----------
+8       16      2       16      
+4       0       4       8       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 73
+----------step:15----------
+8       16      2       16      
+4       0       8       8       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 78
+----------step:16----------
+8       16      2       16      
+4       0       4       16      
+0       0       0       0       
+0       0       0       0       
+Value of this state: 82
+----------step:17----------
+8       16      2       32      
+4       4       4       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 87
+----------step:18----------
+8       16      2       32      
+4       0       4       8       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 92
+----------step:19----------
+8       16      2       32      
+4       0       8       8       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 97
+----------step:20----------
+8       16      2       32      
+4       0       4       16      
+0       0       0       0       
+0       0       0       0       
+Value of this state: 102
+----------step:21----------
+8       16      2       32      
+4       0       8       16      
+0       0       0       0       
+0       0       0       0       
+Value of this state: 107
+----------step:22----------
+8       16      2       32      
+4       4       8       16      
+0       0       0       0       
+0       0       0       0       
+Value of this state: 112
+----------step:23----------
+8       16      2       32      
+4       8       8       16      
+0       0       0       0       
+0       0       0       0       
+Value of this state: 117
+----------step:24----------
+8       16      2       32      
+4       4       16      16      
+0       0       0       0       
+0       0       0       0       
+Value of this state: 122
+----------step:25----------
+8       16      2       32      
+4       0       8       32      
+0       0       0       0       
+0       0       0       0       
+Value of this state: 126
+----------step:26----------
+8       16      2       64      
+4       4       8       0       
+0       0       0       0       
+0       0       0       0       
+Solution found!
+It takes 0.011 s
+Used memory is bytes: 285928.0 bytes
+Used memory is megabytes: 0.27268218994140625 MB

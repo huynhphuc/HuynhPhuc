@@ -1,0 +1,71 @@
+Program is runing ... 
+Value of this state: 10
+----------step:1----------
+2       0       2       0       
+0       0       0       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 15
+----------step:2----------
+4       0       0       4       
+0       0       0       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 20
+----------step:3----------
+4       0       0       8       
+0       0       0       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 25
+----------step:4----------
+4       0       4       8       
+0       0       0       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 30
+----------step:5----------
+4       0       8       8       
+0       0       0       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 35
+----------step:6----------
+4       0       4       16      
+0       0       0       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 40
+----------step:7----------
+4       0       8       16      
+0       0       0       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 45
+----------step:8----------
+4       4       8       16      
+0       0       0       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 50
+----------step:9----------
+4       8       8       16      
+0       0       0       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 55
+----------step:10----------
+4       4       16      16      
+0       0       0       0       
+0       0       0       0       
+0       0       0       0       
+Value of this state: 60
+----------step:11----------
+4       0       8       32      
+0       0       0       0       
+0       0       0       0       
+0       0       0       0       
+Solution found!
+It takes 0.011 s
+Used memory is bytes: 284400.0 bytes
+Used memory is megabytes: 0.2712249755859375 MB
