@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D4FA55C0-64B4-41C5-8774-25EF77068579}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Airline</RootNamespace>
+    <AssemblyName>Airline</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Oracle.DataAccess, Version=2.121.1.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=x86" />
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.121.1.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL" />
+    <Reference Include="Oracle.ManagedDataAccessDTC, Version=4.121.1.0, Culture=neutral, PublicKeyToken=89b483f429c47342" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.DirectoryServices.Protocols" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Class_Model.cs" />
+    <Compile Include="Form_DangKyChuyenBay.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_DangKyChuyenBay.Designer.cs">
+      <DependentUpon>Form_DangKyChuyenBay.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_KHDangKy.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_KHDangKy.Designer.cs">
+      <DependentUpon>Form_KHDangKy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_DangNhap.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_DangNhap.Designer.cs">
+      <DependentUpon>Form_DangNhap.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_KhachHang.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_KhachHang.Designer.cs">
+      <DependentUpon>Form_KhachHang.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_NhanVien.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_NhanVien.Designer.cs">
+      <DependentUpon>Form_NhanVien.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_WellCome.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_WellCome.Designer.cs">
+      <DependentUpon>Form_WellCome.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Form_KHDangKy.resx">
+      <DependentUpon>Form_KHDangKy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_DangKyChuyenBay.resx">
+      <DependentUpon>Form_DangKyChuyenBay.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_DangNhap.resx">
+      <DependentUpon>Form_DangNhap.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_KhachHang.resx">
+      <DependentUpon>Form_KhachHang.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_NhanVien.resx">
+      <DependentUpon>Form_NhanVien.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_WellCome.resx">
+      <DependentUpon>Form_WellCome.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
